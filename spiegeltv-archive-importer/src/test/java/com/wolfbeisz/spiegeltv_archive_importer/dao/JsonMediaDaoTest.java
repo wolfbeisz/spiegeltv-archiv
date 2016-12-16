@@ -66,11 +66,27 @@ public class JsonMediaDaoTest {
 			"    \"is_wide\": true\r\n" + 
 			"}";
 	@Test
-	public void testJsonParsing() {
+	public void testFlatDataMapping() {
 		JsonMediaDao dao = new JsonMediaDao();
 		try(StringReader stringReader = new StringReader(EXAMPLE_JSON)) {
 			Medium medium = dao.readMedium(stringReader);
+			Assert.assertEquals("Phantastische Tierwesen und wo sie zu finden sind", medium.getSubtitle());
+			Assert.assertEquals(null, medium.getAirdate());
+			Assert.assertEquals((Boolean)false, medium.isPremium());
+			Assert.assertEquals(null, medium.getParentMedium());
+			Assert.assertEquals((Boolean)true, medium.isAdAllowed());
+			Assert.assertEquals((Integer)6162, medium.getId());
 			Assert.assertEquals(medium.getUuid(), "763f71a0e2f94cd6835efcfd97a90174");
+			Assert.assertEquals("Making of...", medium.getTitle());
+			Assert.assertEquals("movie", medium.getType());
+			Assert.assertEquals("2016-11-17T13:25:36", medium.getUpdated());
+			Assert.assertTrue(medium.getDescription().startsWith("Außerdem die"));
+			Assert.assertEquals((Integer)752826, medium.getDurationInMs());
+			Assert.assertTrue(medium.getTeaser().startsWith("In New York"));
+			Assert.assertEquals("making-phantastische-tierwesen", medium.getSlug());
+			Assert.assertEquals("de", medium.getLanguage());
+			Assert.assertEquals("2016-11-17T13:02:16", medium.getCreated());
+			Assert.assertEquals((Boolean)true, medium.isWide());
 		}
 	}  
 }
