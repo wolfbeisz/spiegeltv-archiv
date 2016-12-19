@@ -1,5 +1,7 @@
 package com.wolfbeisz.spiegeltv_archive_importer.model;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -30,6 +32,13 @@ public class Medium {
 	private String webAirdate_;
 	@XmlElement(name = "is_wide")
 	private Boolean wide_;
+	
+	/** complex members */
+	@XmlElement(name="tags")
+	private List<String> tags_;
+	
+	@XmlElement(name="images")
+	private List<Image> images_;
 
 	public String getSubtitle() {
 		return subtitle_;
@@ -173,6 +182,18 @@ public class Medium {
 
 	public void setWide(Boolean wide) {
 		this.wide_ = wide;
+	}
+
+	public List<String> getTags() {
+		return tags_;
+	}
+
+	public void setTags(List<String> tags) {
+		this.tags_ = tags;
+	}
+
+	public List<Image> getImages() {
+		return images_;
 	}
 	
 }

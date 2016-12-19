@@ -1,6 +1,13 @@
 package com.wolfbeisz.spiegeltv_archive_importer.dao;
 
 import java.io.StringReader;
+import java.util.Arrays;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 import junit.framework.Assert;
 
@@ -66,8 +73,8 @@ public class JsonMediaDaoTest {
 			"    \"is_wide\": true\r\n" + 
 			"}";
 	@Test
-	public void testFlatDataMapping() {
-		JsonMediaDao dao = new JsonMediaDao();
+	public void testFlatDataMapping() throws JAXBException {
+		JsonMediaDao dao = new JsonMediaDao(JAXBContext.newInstance(Medium.class));
 		try(StringReader stringReader = new StringReader(EXAMPLE_JSON)) {
 			Medium medium = dao.readMedium(stringReader);
 			Assert.assertEquals("Phantastische Tierwesen und wo sie zu finden sind", medium.getSubtitle());
@@ -87,6 +94,9 @@ public class JsonMediaDaoTest {
 			Assert.assertEquals("de", medium.getLanguage());
 			Assert.assertEquals("2016-11-17T13:02:16", medium.getCreated());
 			Assert.assertEquals((Boolean)true, medium.isWide());
+			Assert.assertEquals(Arrays.asList("Making of", "Kino Trailer", "Kino"), medium.getTags());
+			Assert.assertNotNull(medium.getImages());
+			Assert.assertEquals(2, medium.getImages().size());
 		}
 	}  
 }
