@@ -34,14 +34,22 @@ import com.wolfbeisz.spiegeltv_archive_importer.entity.RestApi;
 import com.wolfbeisz.spiegeltv_archive_importer.model.Medium;
 
 public class ImportService {
+	private EntityManager em_;
+	private RestApiService restApiservice_;
+	private TransformService transformService_;
+	private MediumService mediumService_;
+	
+	public ImportService(EntityManager em, RestApiService restApiService, TransformService transformService, MediumService mediumService) {
+		em_ = em;
+		restApiservice_ = restApiService;
+		transformService_ = transformService;
+		mediumService_ = mediumService;
+	}
+	
 	public void importJsonFiles(Collection<File> files, String restApiVersion) throws FileNotFoundException, IOException {
-		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("spiegeltv-archive-importer");
-		EntityManager em = entityManagerFactory.createEntityManager();
-		em.getTransaction().begin();
 		try {
+			em_.getTransaction().begin();
 			JsonMediaDao jsonMediaDao = new JsonMediaDao(JAXBContext.newInstance(Medium.class));
-			TransformService transformService = new TransformService();
-			RestApiService service = buildRestApiService(em);
 			
 			List<com.wolfbeisz.spiegeltv_archive_importer.model.Medium> mediaFromJson = new ArrayList<>();
 			
@@ -51,84 +59,26 @@ public class ImportService {
 				}
 			}
 			
-			RestApi api = transformService.transformToJpaModel(mediaFromJson, restApiVersion);
-			service.insert(api);
+			RestApi api = transformService_.transformToJpaModel(mediaFromJson, restApiVersion);
+			restApiservice_.insert(api);
 			
-			em.getTransaction().commit();
+			em_.getTransaction().commit();
 		} catch (JAXBException e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (em != null)
-				em.close();
-			
-			if (entityManagerFactory != null)
-				entityManagerFactory.close();
 		}
-	}
-
-	private RestApiService buildRestApiService(EntityManager em) {
-		ImageDao imageDao = new ImageDao(em);
-		MediumDao mediumDao = new MediumDao(em);
-		RestApiDao restApiDao = new RestApiDao(em);
-		TagDao tagDao = new TagDao(em);
-		return new RestApiService(imageDao, mediumDao, restApiDao, tagDao);
 	}
 	
 	public void importFromWeb(String restApiVersion) {
-		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("spiegeltv-archive-importer");
-		EntityManager em = entityManagerFactory.createEntityManager();
-		em.getTransaction().begin();
 		try {
-			JsonMediaDao jsonMediaDao = new JsonMediaDao(JAXBContext.newInstance(Medium.class));
-			TransformService transformService = new TransformService();
-			RestApiService service = buildRestApiService(em);
+			em_.getTransaction().begin();
+			List<com.wolfbeisz.spiegeltv_archive_importer.model.Medium> mediaFromJson = mediumService_.getAvailableMedia(restApiVersion);
 			
-			List<Integer> availableMedia = getAvailableMedia(restApiVersion);
-			List<com.wolfbeisz.spiegeltv_archive_importer.model.Medium> mediaFromJson = new ArrayList<>();
+			RestApi api = transformService_.transformToJpaModel(mediaFromJson, restApiVersion);
+			restApiservice_.insert(api);
 			
-			for (Integer id : availableMedia) {
-				try (Reader mediumAsJson = getMediumReader(restApiVersion, id)) {
-					mediaFromJson.add(jsonMediaDao.readMedium(mediumAsJson));
-				}
-				catch (Exception e) {
-					System.out.println(e);
-				}
-			}
-			
-			RestApi api = transformService.transformToJpaModel(mediaFromJson, restApiVersion);
-			service.insert(api);
-			
-			em.getTransaction().commit();
+			em_.getTransaction().commit();
 		} catch (IOException | JAXBException e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (em != null)
-				em.close();
-			
-			if (entityManagerFactory != null)
-				entityManagerFactory.close();
 		}
-	}
-	
-	private List<Integer> getAvailableMedia(String restApiVersion) throws IOException {
-		List<Integer> mediaIds = new ArrayList<>();
-		
-		URL url = new URL("http://spiegeltv-ivms2-restapi.s3.amazonaws.com/"+restApiVersion+"/restapi/media.json");
-		try (InputStream stream = url.openStream(); JsonReader jsonReader = Json.createReader(stream);) {
-			JsonArray ids = jsonReader.readArray();
-			for (JsonValue value : ids) {
-				if (value instanceof JsonNumber) {
-					int id = ((JsonNumber)value).intValue();
-					mediaIds.add(id);
-				}
-			}
-		}
-		
-		return mediaIds;
-	}
-	
-	private Reader getMediumReader(String restApiVersion, Integer mediumId) throws IOException {
-		URL mediumUrl = new URL("http://spiegeltv-ivms2-restapi.s3.amazonaws.com/"+restApiVersion+"/restapi/media/"+mediumId+".json");
-		return new InputStreamReader(mediumUrl.openStream());
 	}
 }
