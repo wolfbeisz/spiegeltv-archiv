@@ -21,9 +21,9 @@ public class TransformService {
 			RestApi api = new RestApi();
 			api.setVersion((new SimpleDateFormat("yyyyMMddHHmmss")).parse(version));
 			Collection<Medium> transformedMedia = transform(media);
-			api.setMedia(transformedMedia);
+			api.getMedia().addAll(transformedMedia);
 			for (Medium medium : transformedMedia) {
-				medium.setApi(api);
+				medium.getApi().add(api);
 			}
 			
 			return api;

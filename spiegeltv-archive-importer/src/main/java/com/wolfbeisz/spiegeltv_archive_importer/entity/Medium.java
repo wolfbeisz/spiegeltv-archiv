@@ -1,6 +1,7 @@
 package com.wolfbeisz.spiegeltv_archive_importer.entity;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -10,6 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -19,9 +22,11 @@ public class Medium {
 	@Column(name = "ID")
 	private Long id_;
 	
-	@OneToOne
-	@JoinColumn(name = "RESTAPI_ID")
-	private RestApi api_;
+//	@OneToOne
+//	@JoinColumn(name = "RESTAPI_ID")
+	@ManyToMany
+	@JoinTable(name = "RESTAPI_MEDIUM", joinColumns = @JoinColumn(name="RESTAPI_ID"), inverseJoinColumns = @JoinColumn(name = "MEDIUM_ID"))
+	private Collection<RestApi> apis_ = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "medium_")
 	private List<Image> images_ = new ArrayList<>();
@@ -89,11 +94,11 @@ public class Medium {
 	public void setId(Long id_) {
 		this.id_ = id_;
 	}
-	public RestApi getApi() {
-		return api_;
+	public Collection<RestApi> getApi() {
+		return apis_;
 	}
-	public void setApi(RestApi api_) {
-		this.api_ = api_;
+	public void setApi(Collection<RestApi> apis_) {
+		this.apis_ = apis_;
 	}
 	public List<Image> getImages() {
 		return images_;

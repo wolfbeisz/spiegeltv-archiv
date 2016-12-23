@@ -1,5 +1,6 @@
 package com.wolfbeisz.spiegeltv_archive_importer.entity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
@@ -9,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 @Entity
@@ -17,8 +19,8 @@ public class RestApi {
 	@Column(name = "ID")
 	private Long id_;
 	
-	@OneToMany(mappedBy="api_")
-	private Collection<Medium> media_;
+	@ManyToMany(mappedBy = "apis_")
+	private Collection<Medium> media_ = new ArrayList<>();
 	
 	@Column(name = "VERSION")
 	private Date version_;
