@@ -14,7 +14,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 @Entity
 public class Medium {
@@ -25,7 +24,7 @@ public class Medium {
 //	@OneToOne
 //	@JoinColumn(name = "RESTAPI_ID")
 	@ManyToMany
-	@JoinTable(name = "RESTAPI_MEDIUM", joinColumns = @JoinColumn(name="RESTAPI_ID"), inverseJoinColumns = @JoinColumn(name = "MEDIUM_ID"))
+	@JoinTable(name = "RESTAPI_MEDIUM", joinColumns = @JoinColumn(name="MEDIUM_ID"), inverseJoinColumns = @JoinColumn(name = "RESTAPI_ID"))
 	private Collection<RestApi> apis_ = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "medium_")
