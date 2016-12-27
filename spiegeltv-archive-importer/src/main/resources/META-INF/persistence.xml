@@ -7,7 +7,7 @@
 	<class>com.wolfbeisz.spiegeltv_archive_importer.entity.Tag</class>
         <properties>
             <!-- see documentation : https://blogs.oracle.com/arungupta/entry/jpa_2_1_schema_generation-->
-            <property name="javax.persistence.schema-generation.database.action" value="drop-and-create" />
+            <property name="javax.persistence.schema-generation.database.action" value="create" />
             <property name="javax.persistence.schema-generation.create-source" value="metadata" />
 
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
