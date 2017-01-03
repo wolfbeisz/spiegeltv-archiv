@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:jsf="http://xmlns.jcp.org/jsf">
+      
+	<f:metadata>
+	    <f:viewParam name="id" value="#{mediumBean.mediumId}"/>
+	    <f:viewAction action="#{mediumBean.loadMedium}" />
+	</f:metadata>
+	
+	<!-- https://richhewlett.com/2015/03/02/setting-http-headers-in-java-server-faces-jsf/ -->
+	<f:event type="preRenderView" listener="#{facesContext.externalContext.response.setHeader('Access-Control-Allow-Origin', '*')}" />
+	
+	<h:head>
+	    <script type="text/javascript" src="./jwplayer/jwplayer.js" />
+	    <script type="text/javascript">jwplayer.key="Fmtii+H5NlCMGlOEsmWU4HDxzdz3U/YFGKhZLw==";</script>
+	</h:head>
+	
+	<h:body>
+		<div id="video-player"></div>
+		
+		<script type="text/javascript">
+			var player = jwplayer('video-player');
+			player.setup({
+				  flashplayer: "jwplayer/jwplayer.flash.swf",
+				  file : "rtmp://s3pwwozuj5hrsa.cloudfront.net/cfx/st/mp4:#{mediumBean.medium.uuid}_spiegeltv_0500_16x9.m4v",
+				  title : "#{mediumBean.medium.title}",
+				  image : "#{mediumBean.medium.images[0].url}",
+				  description : "#{mediumBean.medium.description}"
+	         });
+		</script>
+	</h:body>
+</html>
