@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:jsf="http://xmlns.jcp.org/jsf"
+      xmlns:p="http://primefaces.org/ui">
+      
+      <!-- https://richhewlett.com/2015/03/02/setting-http-headers-in-java-server-faces-jsf/ -->
+	  <f:event type="preRenderView" listener="#{facesContext.externalContext.response.setHeader('Access-Control-Allow-Origin', '*')}" />
+      
+      <h:head>
+      	<link rel="stylesheet" href="./video.js/video-js.min.css" />
+	    <script src="./video.js/video.js" type="text/javascript"></script>
+		<script src="./videojs-contrib-hls/videojs-contrib-hls.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">
+	    	videojs.options.flash.swf = "video.js/video-js.swf";
+	    	
+	    	var player = null;
+	    	var setup = null;
+	    	var loadVideo = function() {
+	    		if (player != null) {
+	    			player.controls(setup.controls);
+	    			player.preload(setup.preload);
+	    			player.poster(setup.poster);
+	    			player.src(setup.src);
+	    		}
+	    	};
+	    	var setupPlayer = function() {
+	    		player = videojs('#player');
+	    		player.options_.techOrder = ["html5", "flash"];
+	    	};
+	    	
+	    	window.onload = setupPlayer;
+	    </script>
+      </h:head>
+      <h:body>
+      <h:form id="form">
+	    <p:dataTable var="medium" value="#{mediaBean.dm}" paginator="true" rows="10"
+	                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+	                 rowsPerPageTemplate="10,20,50" id="mediumTable" widgetVar="mediumTable" lazy="true" reflow="true">
+<!-- 	        <p:column headerText="Id" field="id_" filterBy="#{medium.id}">
+	            <h:outputText value="#{medium.id}" />
+	        </p:column> -->
+	        <p:column headerText="Image">
+	        	<h:graphicImage width="200" value="#{medium.images[0].url}"/>
+	        </p:column>
+	        <p:column headerText="Title" field="title_" filterBy="#{medium.title}">
+	            <h:outputText value="#{medium.title}" />
+	        </p:column>
+	        <p:column headerText="Subtitle" field="subtitle_" filterBy="#{medium.subtitle}">
+	        	<h:outputText value="#{medium.subtitle}"/>
+	        </p:column>
+	        <p:column headerText="Duration" field="durationInMs_" filterBy="#{medium.durationInMs}">
+	        	<h:outputText value="#{medium.durationInMs}">
+	        		<!-- <f:convertDateTime pattern="hh:mm:ss"/> -->
+	        	</h:outputText>
+	        </p:column>
+	        <p:column headerText="Release Date" field="webAirdate_" filterBy="#{medium.webAirdate}">
+	        	<f:facet name="filter">
+	        		<p:inputText onkeyup="PF('mediumTable').filter();">
+	        			<f:convertDateTime pattern="dd.MM.yyyy" />
+	        		</p:inputText>
+	        	</f:facet>
+	        	<h:outputText value="#{medium.webAirdate}">
+	        		<f:convertDateTime pattern="dd.MM.yyyy" />
+	        	</h:outputText>
+	        </p:column>
+	        <p:column headerText="Slug" field="slug_" filterBy="#{medium.slug}">
+	            <h:outputText value="#{medium.slug}" />
+	        </p:column>
+	        <p:column style="width:32px; text-align:center;" headerText="Play">
+              <p:commandButton update=":form:mediumDetail :form:mediumDetailTitle" oncomplete="PF('mediumDialog').show();" icon="ui-icon-play" title="View">
+                <f:setPropertyActionListener value="#{medium}" target="#{mediaBean.selectedMedium}" />
+              </p:commandButton>
+        	</p:column>
+	    </p:dataTable>
+	    <p:dialog widgetVar="mediumDialog" header="Medium Details" onHide="player.reset();">
+	    	<h:outputText id="mediumDetailTitle" value="#{mediaBean.selectedMedium.title}"/>
+	    	<video id="player" class="video-js vjs-default-skin vjs-big-play-centered" height="360" width="640"></video>
+	    	<p:outputPanel id="mediumDetail">
+				<h:outputScript>
+				setup = {controls: true, preload: false, poster: "#{mediaBean.selectedMedium.images[0].url}", src: [{type : "application/x-mpegURL", src : "http://sptv-vod.dcp.adaptive.level3.net/#{mediaBean.selectedMedium.uuid}_spiegeltv_0500_16x9.m4v.m3u8"}, {type: "rtmp/mp4", src: "rtmp://s3pwwozuj5hrsa.cloudfront.net/cfx/st/mp4:#{mediaBean.selectedMedium.uuid}_spiegeltv_0500_16x9.m4v"}]};
+				loadVideo();
+				</h:outputScript>
+	    	</p:outputPanel>
+	    </p:dialog>
+	  </h:form>
+      </h:body>
+</html>
