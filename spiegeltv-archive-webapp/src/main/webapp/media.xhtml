@@ -78,16 +78,18 @@
               </p:commandButton>
         	</p:column>
 	    </p:dataTable>
+	    
 	    <p:dialog widgetVar="mediumDialog" header="Medium Details" onHide="player.reset();">
 	    	<h:outputText id="mediumDetailTitle" value="#{mediaBean.selectedMedium.title}"/>
 	    	<video id="player" class="video-js vjs-default-skin vjs-big-play-centered" height="360" width="640"></video>
 	    	<p:outputPanel id="mediumDetail">
-				<h:outputScript>
-				setup = {controls: true, preload: false, poster: "#{mediaBean.selectedMedium.images[0].url}", src: [{type : "application/x-mpegURL", src : "http://sptv-vod.dcp.adaptive.level3.net/#{mediaBean.selectedMedium.uuid}_spiegeltv_0500_16x9.m4v.m3u8"}, {type: "rtmp/mp4", src: "rtmp://s3pwwozuj5hrsa.cloudfront.net/cfx/st/mp4:#{mediaBean.selectedMedium.uuid}_spiegeltv_0500_16x9.m4v"}]};
+				<h:outputScript rendered="#{mediaBean.selectedMedium != null}">
+				setup = {controls: true, preload: false, poster: "#{mediaBean.selectedMedium.images[0].url}", src: [{type : "application/x-mpegURL", src : "#{mediaBean.m3u8StreamUrl(mediaBean.selectedMedium)}"}, {type: "rtmp/mp4", src: "#{mediaBean.rtmpStreamUrl(mediaBean.selectedMedium)}"}]};
 				loadVideo();
 				</h:outputScript>
 	    	</p:outputPanel>
 	    </p:dialog>
+	    
 	  </h:form>
       </h:body>
 </html>
