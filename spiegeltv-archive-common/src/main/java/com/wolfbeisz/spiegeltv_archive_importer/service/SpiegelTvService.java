@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,5 +36,12 @@ public class SpiegelTvService {
 	public Reader getMediumReader(String restApiVersion, Integer mediumId) throws IOException {
 		URL mediumUrl = new URL("http://spiegeltv-ivms2-restapi.s3.amazonaws.com/"+restApiVersion+"/restapi/media/"+mediumId+".json");
 		return new InputStreamReader(mediumUrl.openStream());
+	}
+	
+	public String getLatestRestapiVersion() throws IOException {
+		URL url = new URL("http://spiegeltv-ivms2-restapi.s3.amazonaws.com/version.json");
+		try (InputStream stream = url.openStream(); JsonReader jsonReader = Json.createReader(stream);) {
+			return jsonReader.readObject().getString("version_name");
+		}
 	}
 }

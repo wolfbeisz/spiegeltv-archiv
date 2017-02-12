@@ -1,5 +1,7 @@
 package com.wolfbeisz.spiegeltv_archive_importer.app;
 
+import java.io.IOException;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -17,8 +19,13 @@ import com.wolfbeisz.spiegeltv_archive_importer.service.TransformService;
 
 public class WebImportApp {
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		WebImportApp app = new WebImportApp();
+		
+		if ("--latest".equals(args[0])) {
+			app.importFromWeb(new SpiegelTvService().getLatestRestapiVersion());
+		}
+		
 		app.importFromWeb(args[0]);
 	}
 	
