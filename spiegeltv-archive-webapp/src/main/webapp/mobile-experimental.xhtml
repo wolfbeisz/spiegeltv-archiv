@@ -26,25 +26,13 @@
 	    	var posters = {};
 	    	var players = {};
 	    	
-	    	var addPlayer = function (mediumId) {
-	    		return videojs(document.getElementById(mediumId), {techOrder: ["html5"], controls: true, preload: false, poster: posters[mediumId]}, function() {
-					this.src(sources[mediumId]);
-				});
-	    	};
-	    	
-	    	var storePlayer = function(bucketId, player) {
-	    		var currentPlayer = players[bucketId];
-	    		if (currentPlayer != null) {
-	    			currentPlayer.dispose();
-	    		}
-	    		players[bucketId] = player;
-	    	};
-	    	
 	    	var initPlayer = function(bucketId, mediumId) {
-	    		videojs(document.getElementById(mediumId), {techOrder: ["html5"], controls: true, preload: false}, function() {
-	    			this.poster(posters[mediumId]);
-					this.src(sources[mediumId]);
-				});
+	    		setTimeout(function () {
+	    			videojs(document.getElementById(bucketId), {techOrder: ["html5"], controls: true, preload: false}, function() {
+		    			this.poster(posters[mediumId]);
+						this.src(sources[mediumId]);
+					});
+	    		}, bucketId * 100);
 	    	};
 	    </script>
       </h:head>
@@ -60,7 +48,7 @@
 	                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
 	                 rowsPerPageTemplate="10,20,50" id="mediumTable" widgetVar="mediumTable" lazy="true" reflow="true" binding="#{mediaBean.dataTable}">
 	        <p:column headerText="Image">
-				<video id="#{medium.id}" class="video-js vjs-default-skin vjs-big-play-centered"></video>
+				<video id="#{mediaBean.dataTable.rowIndex % mediaBean.dataTable.rows}" class="video-js vjs-default-skin vjs-big-play-centered"></video>
  				<h:outputScript>				
 				sources[#{medium.id}] = [{type : "application/x-mpegURL", src : "#{mediaBean.m3u8StreamUrl(medium)}"}, {type: "rtmp/mp4", src: "#{mediaBean.rtmpStreamUrl(medium)}"}];
 				posters[#{medium.id}] = "#{medium.images[0].url}";
@@ -80,11 +68,6 @@
 	        	</h:outputText>
 	        </p:column>
 	        <p:column headerText="Release Date" field="webAirdate_" filterBy="#{medium.webAirdate}">
-	        	<f:facet name="filter">
-	        		<p:inputText onkeyup="PF('mediumTable').filter();">
-	        			<f:convertDateTime pattern="dd.MM.yyyy" />
-	        		</p:inputText>
-	        	</f:facet>
 	        	<h:outputText value="#{medium.webAirdate}">
 	        		<f:convertDateTime pattern="dd.MM.yyyy" />
 	        	</h:outputText>
