@@ -22,15 +22,18 @@
 		<script src="./videojs-contrib-hls/videojs-contrib-hls.min.js" type="text/javascript"></script>
 	    <script type="text/javascript">
 	    	videojs.options.flash.swf = "video.js/video-js.swf";
-	    	var sources = {};
-	    	var posters = {};
 	    	var players = {};
 	    	
-	    	var initPlayer = function(bucketId, mediumId) {
+	    	var initPlayer = function(bucketId, poster, source) {
 	    		setTimeout(function () {
-	    			videojs(document.getElementById(bucketId), {techOrder: ["html5"], controls: true, preload: false}, function() {
-		    			this.poster(posters[mediumId]);
-						this.src(sources[mediumId]);
+	    			var existingPlayer = players[bucketId];
+	    			if (existingPlayer != null) {
+	    				existingPlayer.dispose();
+	    			}
+	    			
+	    			players[bucketId] = videojs(document.getElementById(bucketId), {techOrder: ["html5"], controls: true, preload: false}, function() {
+		    			this.poster(poster);
+						this.src(source);
 					});
 	    		}, bucketId * 100);
 	    	};
@@ -50,11 +53,11 @@
 	        <p:column headerText="Image">
 				<video id="#{mediaBean.dataTable.rowIndex % mediaBean.dataTable.rows}" class="video-js vjs-default-skin vjs-big-play-centered"></video>
  				<h:outputScript>				
-				sources[#{medium.id}] = [{type : "application/x-mpegURL", src : "#{mediaBean.m3u8StreamUrl(medium)}"}, {type: "rtmp/mp4", src: "#{mediaBean.rtmpStreamUrl(medium)}"}];
-				posters[#{medium.id}] = "#{medium.images[0].url}";
+				var source = [{type : "application/x-mpegURL", src : "#{mediaBean.m3u8StreamUrl(medium)}"}, {type: "rtmp/mp4", src: "#{mediaBean.rtmpStreamUrl(medium)}"}];
+				var poster = "#{medium.images[0].url}";
 				var mediaId = #{medium.id};
-				var bucket = #{mediaBean.dataTable.rowIndex % mediaBean.dataTable.rows};
-				initPlayer(bucket, mediaId);
+				var bucketId = #{mediaBean.dataTable.rowIndex % mediaBean.dataTable.rows};
+				initPlayer(bucketId, poster, source);
 				</h:outputScript>
 	        </p:column>
 	        <p:column headerText="Title" field="title_" filterBy="#{medium.title}">
